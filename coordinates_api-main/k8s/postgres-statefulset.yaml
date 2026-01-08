@@ -4,7 +4,6 @@ metadata:
   name: postgres
   labels:
     app: postgres
-    tier: database
 spec:
   serviceName: postgres-svc
   replicas: 3
@@ -15,7 +14,6 @@ spec:
     metadata:
       labels:
         app: postgres
-        tier: database
     spec:
       containers:
       - name: postgres
@@ -26,11 +24,11 @@ spec:
         - name: POSTGRES_DB
           value: "coordinates_db"
         - name: POSTGRES_USER
-          value: " postgres"
+          value: "postgres"
         - name: POSTGRES_PASSWORD
-          value: " postgres"
-        # - name: PGDATA
-        #   value: "/var/lib/postgresql/data/pgdata"
+          value: "postgres"
+        - name: PGDATA
+          value: "/var/lib/postgresql/data/pgdata"
         volumeMounts:
         - name: postgres-storage
           mountPath: /var/lib/postgresql/data

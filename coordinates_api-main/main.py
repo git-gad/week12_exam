@@ -10,15 +10,22 @@ from contextlib import contextmanager, asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan context manager for startup and shutdown events"""
     # Startup
-    init_db()
+    # init_db()
     yield
     # Shutdown (if needed in the future)
 
 app = FastAPI(lifespan=lifespan)
 
+# DB_CONFIG = {
+#     "host": os.environ["DB_HOST"],   
+#     "port": int(os.environ["DB_PORT"]),
+#     "dbname": os.environ["DB_NAME"],
+#     "user": os.environ["DB_USER"],
+#     "password": os.environ["DB_PASSWORD"],
+# }
 # Database configuration
 DB_CONFIG = {
-    "host": os.getenv("POSTGRES_HOST", "localhost"),
+    "host": os.getenv("POSTGRES_HOST"),
     "port": os.getenv("POSTGRES_PORT", "5432"),
     "database": os.getenv("POSTGRES_DB", "coordinates_db"),
     "user": os.getenv("POSTGRES_USER", "postgres"),
@@ -55,36 +62,36 @@ def get_db_connection():
             conn.close()
 
 
-def init_db():
-    """Initialize database connection and create table if not exists"""
-    try:
-        # Test connection
-        with get_db_connection() as conn:
-            with conn.cursor() as cur:
-                # Ping the database
-                cur.execute("SELECT 1")
-                print("✓ Database connection successful!")
+# def init_db():
+#     """Initialize database connection and create table if not exists"""
+#     try:
+#         # Test connection
+#         with get_db_connection() as conn:
+#             with conn.cursor() as cur:
+#                 # Ping the database
+#                 cur.execute("SELECT 1")
+#                 print("✓ Database connection successful!")
 
-                # Create table if not exists
-                cur.execute("""
-                    CREATE TABLE IF NOT EXISTS coordinates (
-                        id SERIAL PRIMARY KEY,
-                        latitude DOUBLE PRECISION NOT NULL,
-                        longitude DOUBLE PRECISION NOT NULL,
-                        name VARCHAR(255),
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )
-                """)
-                conn.commit()
-                print("✓ Table 'coordinates' is ready")
+#                 # Create table if not exists
+#                 cur.execute("""
+#                     CREATE TABLE IF NOT EXISTS coordinates (
+#                         id SERIAL PRIMARY KEY,
+#                         latitude DOUBLE PRECISION NOT NULL,
+#                         longitude DOUBLE PRECISION NOT NULL,
+#                         name VARCHAR(255),
+#                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+#                     )
+#                 """)
+#                 conn.commit()
+#                 print("✓ Table 'coordinates' is ready")
 
-    except psycopg2.OperationalError as e:
-        print(f"✗ Database connection failed: {e}")
-        print("Please check your database configuration and ensure PostgreSQL is running")
-        raise
-    except Exception as e:
-        print(f"✗ Database initialization error: {e}")
-        raise
+#     except psycopg2.OperationalError as e:
+#         print(f"✗ Database connection failed: {e}")
+#         print("Please check your database configuration and ensure PostgreSQL is running")
+#         raise
+#     except Exception as e:
+#         print(f"✗ Database initialization error: {e}")
+#         raise
 
 
 @app.post("/coordinates", response_model=CoordinateResponse, status_code=status.HTTP_201_CREATED)
