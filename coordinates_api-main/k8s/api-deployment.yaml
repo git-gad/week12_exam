@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coordinates-api
+  labels:
+    app: post-api
+    tier: application
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: post-api
+  template:
+    metadata:
+      labels:
+        app: post-api
+        tier: application
+    spec:
+      containers:
+      - name: post-api
+        image: gaddock/coordinates_api:v1 
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DB_HOST
+          value: "postgres-0.postgres-headless" 
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "coordinates_db"
+        - name: DB_USER
+          value: "postgres"
+        - name: DB_PASSWORD
+          value: "postgres"
